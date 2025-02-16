@@ -1,5 +1,8 @@
 package com.hakim.hakimtools;
 
+import com.hakim.hakimtools.audio.AudioPlayer;
+import com.hakim.hakimtools.audio.AudioRecorder;
+import com.hakim.hakimtools.datetime.alarm.Alarm;
 import com.hakim.hakimtools.design.ColorChooser;
 import com.hakim.hakimtools.drawing.Paint;
 import com.hakim.hakimtools.encryption.Encryptor;
@@ -39,10 +42,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+
 import org.apache.xmlbeans.ResourceLoader;
 
 /**
- *
  * @author Hakim
  */
 public class HakimTools extends javax.swing.JFrame {
@@ -75,6 +78,7 @@ public class HakimTools extends javax.swing.JFrame {
         resourceMenu = new javax.swing.JMenu();
         colorPicker = new javax.swing.JMenuItem();
         textMenu = new javax.swing.JMenu();
+        audioMenu = new javax.swing.JMenu();
         finderItem = new javax.swing.JMenuItem();
         findAndReplaceItem = new javax.swing.JMenuItem();
         sorterItem = new javax.swing.JMenuItem();
@@ -85,11 +89,14 @@ public class HakimTools extends javax.swing.JFrame {
         randomTextGeneratorItem = new javax.swing.JMenuItem();
         internetMenu = new javax.swing.JMenu();
         downloaderItem = new javax.swing.JMenuItem();
+        alarmItem = new javax.swing.JMenuItem();
         dateMenu = new javax.swing.JMenu();
         ageCalculatorItem = new javax.swing.JMenuItem();
         zonedDateTimeItem = new javax.swing.JMenuItem();
         paint = new javax.swing.JMenuItem();
         monitor = new javax.swing.JMenuItem();
+        audioRecorder = new javax.swing.JMenuItem();
+        audioPlayer = new javax.swing.JMenuItem();
         epochTimeItem = new javax.swing.JMenuItem();
         generatorMenu = new javax.swing.JMenu();
         qrCodeGenerator = new javax.swing.JMenuItem();
@@ -115,12 +122,12 @@ public class HakimTools extends javax.swing.JFrame {
         javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
         mainPanelLayout.setHorizontalGroup(
-            mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1078, Short.MAX_VALUE)
+                mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1078, Short.MAX_VALUE)
         );
         mainPanelLayout.setVerticalGroup(
-            mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 779, Short.MAX_VALUE)
+                mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 779, Short.MAX_VALUE)
         );
 
         fileMenu.setText("File");
@@ -210,6 +217,12 @@ public class HakimTools extends javax.swing.JFrame {
         paint.addActionListener(this::paintActionPerformed);
         jMenu4.add(paint);
 
+        audioPlayer.setText("Player");
+        audioPlayer.addActionListener(this::playAudio);
+
+        audioRecorder.setText("Record");
+        audioRecorder.addActionListener(this::recordAudio);
+
         monitor.setText("Monitor");
         monitor.addActionListener(this::monitorActionPerformed);
         resourceMenu.add(monitor);
@@ -217,6 +230,10 @@ public class HakimTools extends javax.swing.JFrame {
         jMenuBar1.add(jMenu4);
 
         textMenu.setText("Text");
+        audioMenu.setText("Audio");
+
+        audioMenu.add(audioRecorder);
+        audioMenu.add(audioPlayer);
 
         finderItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         finderItem.setText("Find");
@@ -265,43 +282,35 @@ public class HakimTools extends javax.swing.JFrame {
 
         uniqueItemFinder.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_U, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         uniqueItemFinder.setText("Unique Item Finder");
-        uniqueItemFinder.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                uniqueItemFinderActionPerformed(evt);
-            }
-        });
+        uniqueItemFinder.addActionListener(this::uniqueItemFinderActionPerformed);
         textMenu.add(uniqueItemFinder);
 
         commaSeparatorItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.ALT_DOWN_MASK));
         commaSeparatorItem.setText("CommaSeparator");
-        commaSeparatorItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                commaSeparatorItemActionPerformed(evt);
-            }
-        });
+        commaSeparatorItem.addActionListener(this::commaSeparatorItemActionPerformed);
         textMenu.add(commaSeparatorItem);
 
         randomTextGeneratorItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_G, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         randomTextGeneratorItem.setText("Random Text Generator");
-        randomTextGeneratorItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                randomTextGeneratorItemActionPerformed(evt);
-            }
-        });
+        randomTextGeneratorItem.addActionListener(this::randomTextGeneratorItemActionPerformed);
         textMenu.add(randomTextGeneratorItem);
 
         jMenuBar1.add(textMenu);
+        jMenuBar1.add(audioMenu);
 
         internetMenu.setText("Internet");
 
         downloaderItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         downloaderItem.setText("downloader");
-        downloaderItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                downloaderItemActionPerformed(evt);
-            }
-        });
+        downloaderItem.addActionListener(this::downloaderItemActionPerformed);
         internetMenu.add(downloaderItem);
+
+        alarmItem.setText("Alarm");
+        dateMenu.add(alarmItem);
+        alarmItem.addActionListener((e) -> {
+            var alarm = new Alarm();
+            alarm.setVisible(true);
+        });
 
         jMenuBar1.add(internetMenu);
 
@@ -411,16 +420,24 @@ public class HakimTools extends javax.swing.JFrame {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }
+
+    private void playAudio(ActionEvent actionEvent) {
+        AudioPlayer.start();
+    }
+
+    private void recordAudio(ActionEvent actionEvent) {
+        AudioRecorder.start();
+    }
 
     private void monitorActionPerformed(ActionEvent actionEvent) {
         Monitor monitorObj = new Monitor();
@@ -532,7 +549,7 @@ public class HakimTools extends javax.swing.JFrame {
     }//GEN-LAST:event_saveItemActionPerformed
 
     private void openItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openItemActionPerformed
-        
+
         if (fileChooser == null) {
             fileChooser = new JFileChooser();
         }
@@ -545,9 +562,9 @@ public class HakimTools extends javax.swing.JFrame {
         } else {
             selctedFile = fileChooser.getSelectedFile();
         }
-        
+
         try {
-            
+
             String readString = Files.readString(selctedFile.toPath());
             mainEditorArea.setText(readString);
         } catch (IOException ex) {
@@ -556,19 +573,19 @@ public class HakimTools extends javax.swing.JFrame {
     }//GEN-LAST:event_openItemActionPerformed
 
     private void randomTextGeneratorItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_randomTextGeneratorItemActionPerformed
-        
+
         RandomTextGenerator randomTextGenerator = new RandomTextGenerator();
         randomTextGenerator.setVisible(true);
     }//GEN-LAST:event_randomTextGeneratorItemActionPerformed
 
     private void finderItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_finderItemActionPerformed
-        
+
         Finder finder = new Finder();
         finder.setVisible(true);
     }//GEN-LAST:event_finderItemActionPerformed
 
     private void zonedDateTimeItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zonedDateTimeItemActionPerformed
-        
+
         ZoneTime zoneTime = new ZoneTime();
         zoneTime.setVisible(true);
     }
@@ -598,7 +615,7 @@ public class HakimTools extends javax.swing.JFrame {
     }//GEN-LAST:event_ageCalculatorItemActionPerformed
 
     private void qrCodeGeneratorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_qrCodeGeneratorActionPerformed
-         new QRCodeGeneratorUI().setVisible(true);
+        new QRCodeGeneratorUI().setVisible(true);
     }//GEN-LAST:event_qrCodeGeneratorActionPerformed
 
     private void lightThemeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lightThemeActionPerformed
@@ -680,16 +697,16 @@ public class HakimTools extends javax.swing.JFrame {
         /* Create and display the form */
         createAndDisplay();
     }
-    
-    private static void createAndDisplay(){
+
+    private static void createAndDisplay() {
         java.awt.EventQueue.invokeLater(() -> {
             try {
                 HakimTools frame = new HakimTools();
-                
+
                 ClassLoader classLoader = ResourceLoader.class.getClassLoader();
                 InputStream resourceAsStream = classLoader.getResourceAsStream("img/tools.png");
                 ImageIcon frameIcon = new ImageIcon(resourceAsStream.readAllBytes());
-                
+
                 frame.setIconImage(frameIcon.getImage());
                 frame.setVisible(true);
             } catch (IOException ex) {
@@ -705,6 +722,7 @@ public class HakimTools extends javax.swing.JFrame {
     private javax.swing.JMenuItem converterMenu;
     private javax.swing.JMenuItem darkTheme;
     private javax.swing.JMenu dateMenu;
+    private javax.swing.JMenuItem alarmItem;
     private javax.swing.JMenuItem downloaderItem;
     private javax.swing.JMenuItem draculaTheme;
     private javax.swing.JMenuItem encryptor;
@@ -745,4 +763,7 @@ public class HakimTools extends javax.swing.JFrame {
     private javax.swing.JMenuItem monitor;
     // End of variables declaration//GEN-END:variables
     private JFileChooser fileChooser;
+    private javax.swing.JMenu audioMenu;
+    private javax.swing.JMenuItem audioRecorder;
+    private javax.swing.JMenuItem audioPlayer;
 }
